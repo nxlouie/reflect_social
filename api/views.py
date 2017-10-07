@@ -85,3 +85,4 @@ def get_tag_interactions(request, pk):
     for interaction in interactions:
         ans.append(InteractionSerializer(interaction).data)
     return Response(ans)
+
