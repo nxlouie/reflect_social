@@ -5,9 +5,11 @@ from .models import InteractionTag
 
 
 class ContactSerializer(serializers.ModelSerializer):
+    owner = serializers.ReadOnlyField(source='owner.username')
+
     class Meta:
         model = Contact
-        fields = ('id', 'first_name', 'last_name')
+        fields = ('id', 'first_name', 'last_name', 'owner')
 
 
 class InteractionSerializer(serializers.ModelSerializer):
@@ -20,7 +22,7 @@ class InteractionSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Interaction
-        fields = ('id', 'note', 'contacts', 'tags')
+        fields = ('id', 'note', 'contacts', 'tags', 'owner')
 
 
 class InteractionTagSerializer(serializers.ModelSerializer):
