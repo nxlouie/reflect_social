@@ -5,8 +5,10 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .serializers import ContactSerializer
 from .serializers import InteractionSerializer
+from .serializers import InteractionTagSerializer
 from .models import Contact
 from .models import Interaction
+from .models import InteractionTag
 
 
 # Contacts stuff
@@ -42,6 +44,8 @@ def get_contact_interactions(request, pk):
     return Response(ans)
 
 
+# Interaction Stuff
+
 class CreateInteraction(generics.ListCreateAPIView):
     """api create behavior of interaction"""
     #TODO: Put in tags
@@ -58,3 +62,26 @@ class DetailsInteraction(generics.RetrieveUpdateDestroyAPIView):
     queryset = Interaction.objects.all()
     serializer_class = InteractionSerializer
 
+
+# Tag Stuff
+class CreateTag(generics.ListCreateAPIView):
+    queryset = InteractionTag.objects.all()
+    serializer_class = InteractionTagSerializer
+
+    def perform_create(self, serializer):
+        serializer.save()
+
+
+@api_view(['GET'])
+def get_tag_interactions(request, pk):
+    """gets all interactions for single person"""
+    try:
+        tag = InteractionTag.objects.get(pk=pk)
+    except Contact.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    ans = []
+    interactions = tag.interaction_set.all()
+    for interaction in interactions:
+        ans.append(InteractionSerializer(interaction).data)
+    return Response(ans)
