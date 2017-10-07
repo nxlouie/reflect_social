@@ -1,8 +1,10 @@
 from django.shortcuts import render
 from rest_framework import generics
+from rest_framework import permissions
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from .permissions import IsOwner
 from .serializers import ContactSerializer
 from .serializers import InteractionSerializer
 from .serializers import InteractionTagSerializer
@@ -17,21 +19,28 @@ class CreateContact(generics.ListCreateAPIView):
     """defines api create behavior of contact"""
     queryset = Contact.objects.all()
     serializer_class = ContactSerializer
+    permission_classes = (permissions.IsAuthenticated, IsOwner)
+
+    def get_queryset(self):
+        """Only return items owned by the currently authenticated user."""
+        user = self.request.user
+        return Contact.objects.filter(owner=user)
 
     def perform_create(self, serializer):
         """Save the post data when creating a new contact"""
-        serializer.save()
+        serializer.save(owner=self.request.user)
 
 
 class DetailsContact(generics.RetrieveUpdateDestroyAPIView):
     """Class handles GET, PUT, and DELETE"""
     queryset = Contact.objects.all()
     serializer_class = ContactSerializer
+    permission_classes = (permissions.IsAuthenticated, IsOwner)
 
 
 @api_view(['GET'])
 def get_contact_interactions(request, pk):
-    """gets all interactions for single person"""
+    """gets all interactions for single contact"""
     try:
         contact = Contact.objects.get(pk=pk)
     except Contact.DoesNotExist:
@@ -48,9 +57,15 @@ def get_contact_interactions(request, pk):
 
 class CreateInteraction(generics.ListCreateAPIView):
     """api create behavior of interaction"""
-    #TODO: Put in tags
+    # TODO: Put in tags
     queryset = Interaction.objects.all()
     serializer_class = InteractionSerializer
+    permission_classes = (permissions.IsAuthenticated, IsOwner)
+
+    def get_queryset(self):
+        """Only return items owned by the currently authenticated user."""
+        user = self.request.user
+        return Interaction.objects.filter(owner=user)
 
     def perform_create(self, serializer):
         """Save the post data when creating a new Interaction"""
@@ -61,6 +76,7 @@ class DetailsInteraction(generics.RetrieveUpdateDestroyAPIView):
     """Handles GET, PUT, and DELETE"""
     queryset = Interaction.objects.all()
     serializer_class = InteractionSerializer
+    permission_classes = (permissions.IsAuthenticated, IsOwner)
 
 
 # Tag Stuff
@@ -74,14 +90,15 @@ class CreateTag(generics.ListCreateAPIView):
 
 @api_view(['GET'])
 def get_tag_interactions(request, pk):
-    """gets all interactions for single person"""
+    """gets all of a User's interactions for single tag"""
     try:
         tag = InteractionTag.objects.get(pk=pk)
-    except Contact.DoesNotExist:
+    except InteractionTag.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
     ans = []
     interactions = tag.interaction_set.all()
     for interaction in interactions:
-        ans.append(InteractionSerializer(interaction).data)
+        if request.user == interaction.owner:
+            ans.append(InteractionSerializer(interaction).data)
     return Response(ans)
