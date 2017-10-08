@@ -39,6 +39,21 @@ class DetailsContact(generics.RetrieveUpdateDestroyAPIView):
 
 
 @api_view(['GET'])
+def get_top_contacts(request):
+    interactions = Interaction.objects.filter(owner=request.user)
+    contact_interact_count = {}
+    for interaction in interactions:
+        for contact in interaction.contacts.all():
+            if contact not in contact_interact_count:
+                contact_interact_count[contact] = 1
+            else:
+                contact_interact_count[contact] += 1
+    return Response([((str(k), contact_interact_count[k]) for k in sorted(contact_interact_count, key=contact_interact_count.get,
+                                                         reverse=True))])
+
+
+
+@api_view(['GET'])
 def get_contact_interactions(request, pk):
     """gets all interactions for single contact"""
     try:
