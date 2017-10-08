@@ -1,11 +1,16 @@
-//var React = require('react');
-//var ReactDOM = require('react-dom');
 import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
+import NavBar from './common/NavBar';
+import InteractionForm from './Interactions';
+import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
+import '../css/main.css';
 
 class Hello extends Component {
     render() {
-        return <h1> Hello, React!</h1>
+        return (<div className='container-fluid'>
+            <NavBar/>
+            <InteractionForm/>
+        </div>);
     }
 }
 

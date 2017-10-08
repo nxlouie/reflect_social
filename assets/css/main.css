@@ -1,0 +1,19 @@
+.tag {
+    width: fit-content;
+    padding: 4px;
+    float: left;
+}
+
+.tag-inner {
+    padding: 4px;
+    border-style: solid;
+    color: white;
+}
+
+.tag:hover {
+    cursor: pointer;
+}
+
+.selected {
+    background-color: #2b669a;
+}
