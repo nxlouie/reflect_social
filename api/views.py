@@ -117,3 +117,10 @@ def get_tag_interactions(request, pk):
         if request.user == interaction.owner:
             ans.append(InteractionSerializer(interaction).data)
     return Response(ans)
+
+
+@api_view(['GET'])
+def check_logged_in(request):
+    if request.user:
+        return Response(str(request.user))
+    return Response()
