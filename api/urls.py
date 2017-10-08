@@ -2,6 +2,7 @@ from django.conf.urls import url, include
 from rest_framework.authtoken.views import obtain_auth_token
 from rest_framework.urlpatterns import format_suffix_patterns
 from .views import check_logged_in
+from .views import create_new_user
 from .views import get_contact_interactions
 from .views import get_tag_interactions
 from .views import get_top_contacts
@@ -14,6 +15,7 @@ from .views import CreateTag
 urlpatterns = {
     url(r'^auth/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^check_logged_in', check_logged_in),
+    url(r'^create_new_user', create_new_user),
     url(r'^contacts/$', CreateContact.as_view(), name="create"),
     url(r'^contacts/(?P<pk>[0-9]+)/$', DetailsContact.as_view(), name="details"),
     url(r'^interactions/$', CreateInteraction.as_view(), name="create"),

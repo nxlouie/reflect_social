@@ -1,8 +1,13 @@
 from django.shortcuts import render
+from django.contrib.auth.models import User
 from rest_framework import generics
+from rest_framework.parsers import JSONParser
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework.decorators import api_view
+from rest_framework.decorators import authentication_classes
+from rest_framework.decorators import parser_classes
+from rest_framework.decorators import permission_classes
 from rest_framework.response import Response
 from .permissions import IsOwner
 from .serializers import ContactSerializer
@@ -123,4 +128,18 @@ def get_tag_interactions(request, pk):
 def check_logged_in(request):
     if request.user:
         return Response(str(request.user))
+    return Response()
+
+
+@api_view(['POST'])
+@authentication_classes(())
+@permission_classes(())
+@parser_classes((JSONParser, ))
+def create_new_user(request):
+    params = request.data
+    User.objects.create_user(
+        username=params.get('username', None),
+        email=params.get('email', None),
+        password=params.get('password', None)
+    )
     return Response()
